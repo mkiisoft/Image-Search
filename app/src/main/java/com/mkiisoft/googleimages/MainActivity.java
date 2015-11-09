@@ -191,11 +191,13 @@ public class MainActivity extends AppCompatActivity {
 
                             JSONObject imagesResult = jsonResults.getJSONObject(img);
 
-                            String url = imagesResult.getString("url");
-                            String id  = imagesResult.getString("imageId");
+                            String url   = imagesResult.getString("url");
+                            String id    = imagesResult.getString("imageId");
+                            String title = imagesResult.getString("content");
 
                             images.put("images", url);
                             images.put("imageId", id);
+                            images.put("content", title);
 
                             arraylist.add(images);
 

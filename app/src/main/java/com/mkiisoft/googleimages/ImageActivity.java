@@ -19,6 +19,8 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.mkiisoft.googleimages.utils.crop.CropImage;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -31,6 +33,7 @@ public class ImageActivity extends AppCompatActivity {
     private ImageView mImageFull;
     private TextView  mButtonCancel;
     private TextView  mButtonCrop;
+    private TextView  mFileSize;
     private String    mCopyright;
     private String    imagePath;
     private String    path;
@@ -51,15 +54,15 @@ public class ImageActivity extends AppCompatActivity {
         Bundle extras = intent.getExtras();
 
         final String url = extras.getString("url");
-        final String id = extras.getString("id");
+        final String id  = extras.getString("id");
 
-        dir = new File(android.os.Environment.getExternalStorageDirectory() + "/QMerang");
+        dir  = new File(android.os.Environment.getExternalStorageDirectory() + "/QMerang");
         file = new File(android.os.Environment.getExternalStorageDirectory() + "/QMerang", id + ".jpg");
 
-        mCopyright = getResources().getString(R.string.copyright);
+        mCopyright    = getResources().getString(R.string.copyright);
 
-        mImageFull = (ImageView) findViewById(R.id.image_full);
-
+        mImageFull    = (ImageView) findViewById(R.id.image_full);
+        mFileSize     = (TextView) findViewById(R.id.file_size);
         mButtonCancel = (TextView) findViewById(R.id.button_cancel);
         mButtonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,6 +134,9 @@ public class ImageActivity extends AppCompatActivity {
                     protected void onPostExecute(String string) {
                         imagePath = String.valueOf(file);
                         didFinish = true;
+                        long length = file.length();
+                        length = length/1024;
+                        mFileSize.setText("" + length + "Kb");
                     }
 
                 }.execute();

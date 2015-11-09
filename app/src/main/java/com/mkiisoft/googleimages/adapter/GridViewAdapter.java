@@ -5,11 +5,15 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.support.v7.graphics.Palette;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -32,6 +36,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 /**
  * Created by mariano on 11/8/15.
@@ -69,10 +75,12 @@ public class GridViewAdapter extends BaseAdapter {
 
     public View getView(final int position, View convertView, ViewGroup parent) {
 
-        final String img    = "images";
-        final String imgId  = "imageId";
+        final String img   = "images";
+        final String imgId = "imageId";
+        final String title = "content";
 
         final SquareImageView appicon;
+        final TextView mTitle;
 
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -88,7 +96,7 @@ public class GridViewAdapter extends BaseAdapter {
                 Intent intent = new Intent(context, ImageActivity.class);
 
                 intent.putExtra("url", resultp.get(img));
-                intent.putExtra("id" , resultp.get(imgId));
+                intent.putExtra("id", resultp.get(imgId));
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                 context.startActivity(intent);
@@ -96,12 +104,37 @@ public class GridViewAdapter extends BaseAdapter {
         });
 
         appicon = (SquareImageView) itemView.findViewById(R.id.grid_thumb_img);
+        mTitle = (TextView) itemView.findViewById(R.id.title_text);
+
+        mTitle.setText(Html.fromHtml(resultp.get(title)));
 
         Glide.with(context)
                 .load(resultp.get(img))
+                .asBitmap()
                 .placeholder(R.drawable.ic_loading)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(appicon);
+                .skipMemoryCache(false)
+                .into(new SimpleTarget() {
+                    @Override
+                    public void onResourceReady(final Object resource, final GlideAnimation glideAnimation) {
+                        appicon.setImageBitmap((Bitmap) resource);
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            public void run() {
+                                if (resource != null) {
+                                    Palette.from((Bitmap) resource).generate(new Palette.PaletteAsyncListener() {
+                                        @Override
+                                        public void onGenerated(Palette palette) {
+                                            int vibrant = palette.getVibrantColor(0x000000);
+                                            mTitle.setBackgroundColor(vibrant);
+                                        }
+                                    });
+                                }
+                            }
+                        }, 0);
+
+                    }
+
+                });
 
         return itemView;
     }
