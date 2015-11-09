@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">GoogleImages</string>
+
+    <!-- paging gridview -->
+    <string name="loading">Cargando&#8230;</string>
+
+    <!-- search box and results -->
+    <string name="results">Tu busqueda no produjo resultados</string>
+    <string name="searchbox">El campo de busqueda no puede quedar vacio</string>
+
+    <!-- image full -->
+    <string name="copyright">Imagen protegida por derechos de autor. No se puede modificar.</string>
+    <string name="undo">Cancelar</string>
+    <string name="crop">Cortar</string>
+
+    <!-- image crop -->
+    <string name="cancel">Regresar</string>
+    <string name="save">Guardar</string>
+    <string name="saving_image">Guardando imagen</string>
+    <string name="preparing_card">Preparando memoria</string>
+    <string name="no_storage_card">Memoria no disponible</string>
+    <string name="not_enough_space">Memoria insuficiente</string>
+
+</resources>

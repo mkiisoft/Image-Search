@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#40000000">
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/image_full"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="100dp"
+        android:layout_weight="1"
+        android:background="@color/colorPrimary">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="@string/undo"
+            android:id="@+id/button_cancel"
+            android:layout_weight="1"
+            android:textColor="#FFF"
+            android:gravity="center"
+            android:textSize="@dimen/button_text_size" />
+        <View
+            android:layout_width="1dp"
+            android:layout_height="fill_parent"
+            android:background="#50FFFFFF"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:id="@+id/divider" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="@string/crop"
+            android:id="@+id/button_crop"
+            android:layout_weight="1"
+            android:textColor="#FFF"
+            android:gravity="center"
+            android:textSize="@dimen/button_text_size" />
+    </LinearLayout>
+</LinearLayout>
