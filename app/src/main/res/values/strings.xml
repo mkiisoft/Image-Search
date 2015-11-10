@@ -10,7 +10,7 @@
     <string name="emptystring"></string>
 
     <!-- api URLs -->
-    <string name="apiurl">https://ajax.googleapis.com/ajax/services/search/images?v=1.0&amp;rsz=8&amp;safe=active&amp;imgsz=medium&amp;as_filetype=jpg&amp;q=</string>
+    <string name="apiurl">https://ajax.googleapis.com/ajax/services/search/images?v=1.0&amp;rsz=8&amp;safe=active&amp;as_filetype=jpg&amp;q=</string>
 
     <!-- image full -->
     <string name="copyright">Copyright protected image. Can\'t be modify.</string>
@@ -24,5 +24,12 @@
     <string name="preparing_card">Preparing card</string>
     <string name="no_storage_card">No storage card</string>
     <string name="not_enough_space">Not enough space</string>
+
+    <!-- image error -->
+    <string name="img_error">Image broken</string>
+
+    <!-- app intro -->
+    <string name="skip_button">SKIP</string>
+    <string name="done_button">DONE</string>
 
 </resources>

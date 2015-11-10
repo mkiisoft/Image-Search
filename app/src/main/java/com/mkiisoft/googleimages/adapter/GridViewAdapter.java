@@ -3,6 +3,8 @@ package com.mkiisoft.googleimages.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -44,11 +47,10 @@ import org.w3c.dom.Text;
  */
 public class GridViewAdapter extends BaseAdapter {
 
-    // Declare Variables
     Context context;
     LayoutInflater inflater;
     ArrayList<HashMap<String, String>> data;
-    //ImageLoader imageLoader;
+
     HashMap<String, String> resultp = new HashMap<String, String>();
 
     public GridViewAdapter(Context context,
@@ -73,13 +75,15 @@ public class GridViewAdapter extends BaseAdapter {
         return 0;
     }
 
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, final View convertView, ViewGroup parent) {
 
-        final String img   = "images";
+        final String img = "images";
         final String imgId = "imageId";
         final String title = "content";
 
         final SquareImageView appicon;
+        final Exception e = null;
+
         final TextView mTitle;
 
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -87,6 +91,8 @@ public class GridViewAdapter extends BaseAdapter {
         View itemView = inflater.inflate(R.layout.grid_item, parent, false);
 
         resultp = data.get(position);
+
+        final String[] titleIndex = new String[position];
 
         itemView.setOnClickListener(new View.OnClickListener() {
 
@@ -105,6 +111,7 @@ public class GridViewAdapter extends BaseAdapter {
 
         appicon = (SquareImageView) itemView.findViewById(R.id.grid_thumb_img);
         mTitle = (TextView) itemView.findViewById(R.id.title_text);
+        mTitle.setAlpha(0);
 
         mTitle.setText(Html.fromHtml(resultp.get(title)));
 
@@ -114,6 +121,7 @@ public class GridViewAdapter extends BaseAdapter {
                 .placeholder(R.drawable.ic_loading)
                 .skipMemoryCache(false)
                 .into(new SimpleTarget() {
+
                     @Override
                     public void onResourceReady(final Object resource, final GlideAnimation glideAnimation) {
                         appicon.setImageBitmap((Bitmap) resource);
@@ -124,18 +132,49 @@ public class GridViewAdapter extends BaseAdapter {
                                     Palette.from((Bitmap) resource).generate(new Palette.PaletteAsyncListener() {
                                         @Override
                                         public void onGenerated(Palette palette) {
-                                            int vibrant = palette.getVibrantColor(0x000000);
-                                            mTitle.setBackgroundColor(vibrant);
+                                            int vibrant = palette.getVibrantColor(0x3333FF);
+                                            if (vibrant == setInteger(R.integer.empty_img_color)) {
+                                                mTitle.setBackgroundColor(setColor(R.color.colorPrimary));
+                                            } else {
+                                                mTitle.setBackgroundColor(vibrant);
+                                            }
+                                            mTitle.animate().alpha(1).setDuration(300);
                                         }
                                     });
                                 }
                             }
                         }, 0);
-
                     }
 
+                    @Override
+                     public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                        Glide.with(context).load(R.drawable.ic_img_broken).skipMemoryCache(false).into(appicon);
+                        mTitle.setBackgroundColor(setColor(R.color.colorPrimary));
+                        mTitle.animate().alpha(1).setDuration(300);
+                        mTitle.setText(setText(R.string.img_error));
+                    }
                 });
 
         return itemView;
+    }
+
+    private int setColor(int color) {
+        context.getResources().getColor(color);
+        return color;
+    }
+
+    private Drawable setDrawable(int id) {
+        Drawable img = context.getResources().getDrawable(id);
+        return img;
+    }
+
+    private int setInteger(int integer) {
+        context.getResources().getInteger(integer);
+        return integer;
+    }
+
+    private String setText(int id) {
+        String text = context.getResources().getString(id);
+        return text;
     }
 }

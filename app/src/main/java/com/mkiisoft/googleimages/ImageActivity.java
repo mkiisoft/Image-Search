@@ -3,6 +3,7 @@ package com.mkiisoft.googleimages;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.mkiisoft.googleimages.utils.ScaleImageView;
 import com.mkiisoft.googleimages.utils.crop.CropImage;
 
 import org.w3c.dom.Text;
@@ -30,20 +32,19 @@ import java.io.OutputStream;
  */
 public class ImageActivity extends AppCompatActivity {
 
-    private ImageView mImageFull;
-    private TextView  mButtonCancel;
-    private TextView  mButtonCrop;
-    private TextView  mFileSize;
-    private String    mCopyright;
-    private String    imagePath;
-    private String    path;
-    private File      dir;
-    private File      file;
-    private boolean   didFinish   = false;
-    private boolean   isCopyright = false;
+    private ScaleImageView mImageFull;
+    private TextView mButtonCancel;
+    private TextView mButtonCrop;
+    private String mCopyright;
+    private String imagePath;
+    private String path;
+    private File dir;
+    private File file;
+    private boolean didFinish = false;
+    private boolean isCopyright = false;
 
     private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
-    public static final int REQUEST_CODE_CROP_IMAGE   = 0x3;
+    public static final int REQUEST_CODE_CROP_IMAGE = 0x3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,15 +55,14 @@ public class ImageActivity extends AppCompatActivity {
         Bundle extras = intent.getExtras();
 
         final String url = extras.getString("url");
-        final String id  = extras.getString("id");
+        final String id = extras.getString("id");
 
-        dir  = new File(android.os.Environment.getExternalStorageDirectory() + "/QMerang");
+        dir = new File(android.os.Environment.getExternalStorageDirectory() + "/QMerang");
         file = new File(android.os.Environment.getExternalStorageDirectory() + "/QMerang", id + ".jpg");
 
-        mCopyright    = getResources().getString(R.string.copyright);
+        mCopyright = getResources().getString(R.string.copyright);
 
-        mImageFull    = (ImageView) findViewById(R.id.image_full);
-        mFileSize     = (TextView) findViewById(R.id.file_size);
+        mImageFull = (ScaleImageView) findViewById(R.id.image_full);
         mButtonCancel = (TextView) findViewById(R.id.button_cancel);
         mButtonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,74 +75,73 @@ public class ImageActivity extends AppCompatActivity {
         mButtonCrop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(didFinish && !isCopyright){
+                if (didFinish && !isCopyright) {
                     startCropImage();
-                } else if (isCopyright){
+                } else if (isCopyright) {
                     Toast.makeText(ImageActivity.this, mCopyright, Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        Glide.with(this).load(url).placeholder(R.drawable.ic_loading).into(new SimpleTarget() {
-            @Override
-            public void onResourceReady(Object resource, GlideAnimation glideAnimation) {
-
-                Bitmap b = null;
-
-                try {
-                    mImageFull.setImageDrawable((GlideBitmapDrawable) resource);
-                } catch (ClassCastException e) {
-                    mImageFull.setImageDrawable((GifDrawable) resource);
-                }
-
-                mImageFull.setDrawingCacheEnabled(true);
-
-                mImageFull.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-                mImageFull.layout(0, 0, mImageFull.getMeasuredWidth(), mImageFull.getMeasuredHeight());
-
-                mImageFull.buildDrawingCache(true);
-                try{
-                    b = Bitmap.createBitmap(mImageFull.getDrawingCache());
-                } catch (Exception e) {
-                    isCopyright = true;
-                }
-
-                mImageFull.setDrawingCacheEnabled(false);
-
-                final Bitmap finalB = b;
-                new AsyncTask<Void, Void, String>() {
+        Glide.with(this)
+                .load(url)
+                .asBitmap()
+                .into(new SimpleTarget() {
                     @Override
-                    protected String doInBackground(Void... params) {
+                    public void onResourceReady(Object resource, GlideAnimation glideAnimation) {
 
-                        if (!dir.exists()) {
-                            dir.mkdirs();
-                        }
+                        mImageFull.setImageBitmap((Bitmap) resource);
+                        mImageFull.setDrawingCacheEnabled(true);
 
+                        mImageFull.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                        mImageFull.layout(0, 0, mImageFull.getMeasuredWidth(), mImageFull.getMeasuredHeight());
+
+                        mImageFull.buildDrawingCache(true);
                         try {
-                            OutputStream os = new FileOutputStream(file);
-                            finalB.compress(Bitmap.CompressFormat.JPEG, 100, os);
-
+                            resource = Bitmap.createBitmap(mImageFull.getDrawingCache());
                         } catch (Exception e) {
-                            System.out.println(e);
+                            isCopyright = true;
                         }
+                        mImageFull.setDrawingCacheEnabled(false);
 
-                        return null;
+                        final Bitmap b = (Bitmap) resource;
+                        new AsyncTask<Void, Void, String>() {
+                            @Override
+                            protected String doInBackground(Void... params) {
+
+                                if (!dir.exists()) {
+                                    dir.mkdirs();
+                                }
+
+                                try {
+                                    OutputStream os = new FileOutputStream(file);
+                                    b.compress(Bitmap.CompressFormat.JPEG, 100, os);
+
+                                } catch (Exception e) {
+                                    System.out.println(e);
+                                }
+
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(String string) {
+                                imagePath = String.valueOf(file);
+                                didFinish = true;
+                                long length = file.length();
+                                length = length / 1024;
+                            }
+
+                        }.execute();
+
                     }
 
                     @Override
-                    protected void onPostExecute(String string) {
-                        imagePath = String.valueOf(file);
-                        didFinish = true;
-                        long length = file.length();
-                        length = length/1024;
-                        mFileSize.setText("" + length + "Kb");
+                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                        Glide.with(getApplicationContext()).load(R.drawable.ic_img_broken).skipMemoryCache(false).into(mImageFull);
                     }
-
-                }.execute();
-
-            }
-        });
+                });
     }
 
     private void startCropImage() {

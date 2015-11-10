@@ -21,4 +21,11 @@
     <string name="no_storage_card">Memoria no disponible</string>
     <string name="not_enough_space">Memoria insuficiente</string>
 
+    <!-- image error -->
+    <string name="img_error">Imagen rota</string>
+
+    <!-- app intro -->
+    <string name="skip_button">SALTAR</string>
+    <string name="done_button">LISTO</string>
+
 </resources>
