@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#4bb5c5">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        android:background="#20FFFFFF">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:id="@+id/btn_gallery"
+            android:src="@drawable/gallery"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:id="@+id/btn_camera"
+            android:src="@drawable/camera"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:id="@+id/btn_internet"
+            android:src="@drawable/internet"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SELECT IMAGE"
+        android:id="@+id/select_title"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:textSize="20dp"
+        android:textColor="#FFF" />
+</RelativeLayout>

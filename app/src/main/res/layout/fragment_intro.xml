@@ -25,7 +25,7 @@
         android:layout_gravity="center"
         android:id="@+id/image"
         android:visibility="visible"
-        android:scaleType="centerCrop" />
+        android:scaleType="fitXY" />
 
     <TextView
         android:layout_width="wrap_content"

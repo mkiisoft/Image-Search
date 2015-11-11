@@ -19,7 +19,7 @@ public class IntroActivity extends AppIntro {
         getSupportActionBar().hide();
 
         if(KeySaver.isExist(this, "doneintro")){
-            Intent intent = new Intent(IntroActivity.this, MainActivity.class);
+            Intent intent = new Intent(IntroActivity.this, SelectActivity.class);
             startActivity(intent);
             finish();
         }
@@ -42,7 +42,7 @@ public class IntroActivity extends AppIntro {
     @Override
     public void onDonePressed() {
         KeySaver.saveShare(IntroActivity.this, "doneintro", "true");
-        Intent intent = new Intent(IntroActivity.this, MainActivity.class);
+        Intent intent = new Intent(IntroActivity.this, SelectActivity.class);
         startActivity(intent);
         finish();
     }

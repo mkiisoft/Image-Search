@@ -42,6 +42,7 @@ public class ImageActivity extends AppCompatActivity {
     private File file;
     private boolean didFinish = false;
     private boolean isCopyright = false;
+    private boolean mNotInternet;
 
     private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
     public static final int REQUEST_CODE_CROP_IMAGE = 0x3;
@@ -57,6 +58,12 @@ public class ImageActivity extends AppCompatActivity {
         final String url = extras.getString("url");
         final String id = extras.getString("id");
 
+        if (intent != null && intent.getStringExtra("not_internet") != null) {
+            mNotInternet = true;
+        } else {
+            mNotInternet = false;
+        }
+
         dir = new File(android.os.Environment.getExternalStorageDirectory() + "/QMerang");
         file = new File(android.os.Environment.getExternalStorageDirectory() + "/QMerang", id + ".jpg");
 
@@ -67,7 +74,7 @@ public class ImageActivity extends AppCompatActivity {
         mButtonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                deleteFolder();
             }
         });
 
@@ -75,10 +82,12 @@ public class ImageActivity extends AppCompatActivity {
         mButtonCrop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (didFinish && !isCopyright) {
+                if (didFinish && !isCopyright && !mNotInternet) {
                     startCropImage();
                 } else if (isCopyright) {
                     Toast.makeText(ImageActivity.this, mCopyright, Toast.LENGTH_SHORT).show();
+                } else if (mNotInternet){
+                    mButtonCrop.setEnabled(false);
                 }
             }
         });
@@ -91,49 +100,52 @@ public class ImageActivity extends AppCompatActivity {
                     public void onResourceReady(Object resource, GlideAnimation glideAnimation) {
 
                         mImageFull.setImageBitmap((Bitmap) resource);
-                        mImageFull.setDrawingCacheEnabled(true);
 
-                        mImageFull.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-                                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-                        mImageFull.layout(0, 0, mImageFull.getMeasuredWidth(), mImageFull.getMeasuredHeight());
+                        if(!mNotInternet){
+                            mImageFull.setDrawingCacheEnabled(true);
 
-                        mImageFull.buildDrawingCache(true);
-                        try {
-                            resource = Bitmap.createBitmap(mImageFull.getDrawingCache());
-                        } catch (Exception e) {
-                            isCopyright = true;
+                            mImageFull.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                            mImageFull.layout(0, 0, mImageFull.getMeasuredWidth(), mImageFull.getMeasuredHeight());
+
+                            mImageFull.buildDrawingCache(true);
+                            try {
+                                resource = Bitmap.createBitmap(mImageFull.getDrawingCache());
+                            } catch (Exception e) {
+                                isCopyright = true;
+                            }
+                            mImageFull.setDrawingCacheEnabled(false);
+
+                            final Bitmap b = (Bitmap) resource;
+                            new AsyncTask<Void, Void, String>() {
+                                @Override
+                                protected String doInBackground(Void... params) {
+
+                                    if (!dir.exists()) {
+                                        dir.mkdirs();
+                                    }
+
+                                    try {
+                                        OutputStream os = new FileOutputStream(file);
+                                        b.compress(Bitmap.CompressFormat.JPEG, 100, os);
+
+                                    } catch (Exception e) {
+                                        System.out.println(e);
+                                    }
+
+                                    return null;
+                                }
+
+                                @Override
+                                protected void onPostExecute(String string) {
+                                    imagePath = String.valueOf(file);
+                                    didFinish = true;
+                                    long length = file.length();
+                                    length = length / 1024;
+                                }
+
+                            }.execute();
                         }
-                        mImageFull.setDrawingCacheEnabled(false);
-
-                        final Bitmap b = (Bitmap) resource;
-                        new AsyncTask<Void, Void, String>() {
-                            @Override
-                            protected String doInBackground(Void... params) {
-
-                                if (!dir.exists()) {
-                                    dir.mkdirs();
-                                }
-
-                                try {
-                                    OutputStream os = new FileOutputStream(file);
-                                    b.compress(Bitmap.CompressFormat.JPEG, 100, os);
-
-                                } catch (Exception e) {
-                                    System.out.println(e);
-                                }
-
-                                return null;
-                            }
-
-                            @Override
-                            protected void onPostExecute(String string) {
-                                imagePath = String.valueOf(file);
-                                didFinish = true;
-                                long length = file.length();
-                                length = length / 1024;
-                            }
-
-                        }.execute();
 
                     }
 
@@ -191,5 +203,21 @@ public class ImageActivity extends AppCompatActivity {
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void deleteFolder(){
+        File dir = new File(android.os.Environment.getExternalStorageDirectory() + "/QMerang");
+
+        if(dir.exists()){
+            if (dir.isDirectory())
+            {
+                String[] children = dir.list();
+                for (int i = 0; i < children.length; i++)
+                {
+                    new File(dir, children[i]).delete();
+                    finish();
+                }
+            }
+        }
     }
 }

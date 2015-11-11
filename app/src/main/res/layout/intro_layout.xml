@@ -7,7 +7,7 @@
             android:id="@+id/view_pager"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/bottom">
+            android:layout_centerInParent="true">
         </com.mkiisoft.googleimages.utils.intro.AppIntroViewPager>
         <LinearLayout
             android:id="@+id/bottom"
