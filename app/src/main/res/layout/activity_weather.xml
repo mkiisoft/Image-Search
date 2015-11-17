@@ -101,11 +101,13 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="88dp"
+        android:layout_height="76dp"
         android:layout_gravity="bottom"
         android:orientation="vertical"
         android:layout_below="@+id/city_main"
-        android:layout_marginTop="-44dp">
+        android:layout_marginTop="-38dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp">
 
 
         <ImageButton
@@ -117,14 +119,14 @@
             android:layout_marginRight="16dp"
             android:background="@drawable/ripple"
             android:elevation="8dp"
-            android:src="@drawable/ic_map_marker_white_36dp"
+            android:src="@drawable/ic_map_marker_white_24dp"
             android:stateListAnimator="@anim/fab_raise" />
 
         <RelativeLayout
             android:id="@+id/expanded_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorPrimary"
+            android:background="#FFF"
             android:orientation="horizontal"
             android:padding="16dp"
             android:visibility="invisible">
@@ -135,7 +137,7 @@
                 android:layout_height="56dp"
                 android:layout_alignParentRight="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_settings_white_18dp"
+                android:src="@drawable/ic_settings_black_24dp"
                 android:tint="@color/colorPrimary" />
 
             <LinearLayout
@@ -147,8 +149,7 @@
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/input_layout_search"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp">
+                    android:layout_height="wrap_content">
                     <EditText
                         android:layout_width="fill_parent"
                         android:layout_height="50dp"
