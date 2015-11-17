@@ -19,6 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".SelectActivity"/>
+        <activity android:name=".WeatherActivity"/>
         <activity android:name=".MainActivity"/>
         <activity android:name=".ImageActivity"/>
         <activity android:name=".utils.crop.CropImage"/>

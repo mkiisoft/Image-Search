@@ -62,7 +62,9 @@ public class SelectActivity extends AppCompatActivity {
         mCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openCamera();
+//                openCamera();
+                Intent intent = new Intent(SelectActivity.this, WeatherActivity.class);
+                startActivity(intent);
             }
         });
 

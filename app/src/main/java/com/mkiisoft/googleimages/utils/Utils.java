@@ -8,13 +8,22 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Random;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Transformation;
+import android.widget.TextView;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -98,6 +107,48 @@ public class Utils {
         }
         result = HaveConnectedWifi || HaveConnectedMobile;
         return result;
+    }
+
+    public static int randInt(int min, int max) {
+
+        return (int)(Math.random() * ((max - min) + 1)) + min;
+    }
+
+    public static void animateTextView(int initialValue, int finalValue, final TextView textview) {
+        DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator(0.2f);
+        int start = Math.min(initialValue, finalValue);
+        int end = Math.max(initialValue, finalValue);
+        int difference = Math.abs(finalValue - initialValue);
+        Handler handler = new Handler();
+        for (int count = start; count <= end; count++) {
+            int time = Math.round(decelerateInterpolator.getInterpolation((((float) count) / difference)) * 50) * count;
+            final int finalCount = ((initialValue > finalValue) ? initialValue - count : count);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    textview.setText(finalCount + "");
+                }
+            }, time);
+        }
+    }
+
+    public static void animateBetweenColors(final View viewToAnimateItBackground, final int colorFrom, final int colorTo,
+                                            final int durationInMs) {
+        final ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+        colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            ColorDrawable colorDrawable = new ColorDrawable(colorFrom);
+
+            @Override
+            public void onAnimationUpdate(final ValueAnimator animator) {
+                colorDrawable.setColor((Integer) animator.getAnimatedValue());
+                viewToAnimateItBackground.setBackgroundDrawable(colorDrawable);
+            }
+        });
+        if (durationInMs >= 0)
+            colorAnimation.setInterpolator(new DecelerateInterpolator());
+            colorAnimation.setStartDelay(200);
+            colorAnimation.setDuration(durationInMs);
+        colorAnimation.start();
     }
 
 }
