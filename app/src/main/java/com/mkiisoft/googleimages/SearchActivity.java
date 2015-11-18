@@ -3,7 +3,6 @@ package com.mkiisoft.googleimages;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.style.EasyEditSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -15,10 +14,8 @@ import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
-import com.loopj.android.http.*;
 import com.mkiisoft.googleimages.adapter.GridViewAdapter;
 import com.mkiisoft.googleimages.utils.Utils;
 
@@ -31,7 +28,7 @@ import java.util.HashMap;
 
 import cz.msebera.android.httpclient.Header;
 
-public class MainActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity {
 
     private String          mApiURL;
 
@@ -55,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_search);
 
         mApiURL     = getResources().getString(R.string.apiurl);
         searchURL   = getResources().getString(R.string.emptystring);
@@ -89,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     return true;
                 } else if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER) && searchBox.getText().toString().trim().length() == 0) {
-                    Toast.makeText(MainActivity.this, mSearchBox, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SearchActivity.this, mSearchBox, Toast.LENGTH_SHORT).show();
                 }
                 return false;
             }
@@ -171,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                     if (status == 403) {
                         String details = jsonImages.getString("responseDetails");
                         Log.e("details", details);
-                        Toast.makeText(MainActivity.this, details, Toast.LENGTH_LONG).show();
+                        Toast.makeText(SearchActivity.this, details, Toast.LENGTH_LONG).show();
                     }
 
                     if (jsonImages.getJSONObject("responseData") != null) {
@@ -182,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
                         JSONArray jsonResults = jsonResponse.getJSONArray("results");
 
                         if (jsonResults.length() == 0) {
-                            Toast.makeText(MainActivity.this, mNoResults, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SearchActivity.this, mNoResults, Toast.LENGTH_SHORT).show();
                             mGridImages.removeFooterView(true);
                         }
 
@@ -203,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
 
                         }
 
-                        MainActivity.this.runOnUiThread(new Runnable() {
+                        SearchActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 if (pager <= 1) {
