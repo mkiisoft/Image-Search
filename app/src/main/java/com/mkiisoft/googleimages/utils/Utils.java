@@ -13,6 +13,7 @@ import java.util.Random;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -24,6 +25,10 @@ import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
 import android.widget.TextView;
+
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -121,7 +126,7 @@ public class Utils {
         int difference = Math.abs(finalValue - initialValue);
         Handler handler = new Handler();
         for (int count = start; count <= end; count++) {
-            int time = Math.round(decelerateInterpolator.getInterpolation((((float) count) / difference)) * 50) * count;
+            int time = Math.round(decelerateInterpolator.getInterpolation((((float) count) / difference)) * 60) * count;
             final int finalCount = ((initialValue > finalValue) ? initialValue - count : count);
             handler.postDelayed(new Runnable() {
                 @Override
@@ -131,6 +136,17 @@ public class Utils {
             }, time);
         }
     }
+
+    /**
+     *
+     * Class to animate the background color of a View
+     *
+     * @param viewToAnimateItBackground the View that will animate
+     * @param colorFrom int from Color. Could be generate trough Color.parse for HEX
+     * @param colorTo   int to Color. Could be generate trough Color.parse for HEX
+     * @param durationInMs final duration for the animation
+     *
+     */
 
     public static void animateBetweenColors(final View viewToAnimateItBackground, final int colorFrom, final int colorTo,
                                             final int durationInMs) {
@@ -149,6 +165,46 @@ public class Utils {
             colorAnimation.setStartDelay(200);
             colorAnimation.setDuration(durationInMs);
         colorAnimation.start();
+    }
+
+    /**
+     *
+     * API Call for GET, PUT, POST, DELETE Http responses
+     *
+     */
+
+    public static class ApiCall {
+
+        private AsyncHttpClient client = new AsyncHttpClient();
+
+        public void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+            client.get(getAbsoluteUrl(url), params, responseHandler);
+        }
+
+        public void put(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+            client.put(getAbsoluteUrl(url), params, responseHandler);
+        }
+
+        public void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+            client.post(getAbsoluteUrl(url), params, responseHandler);
+        }
+
+        public void delete(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+            client.delete(getAbsoluteUrl(url), params, responseHandler);
+        }
+
+        private String getAbsoluteUrl(String relativeUrl) {
+            return relativeUrl;
+        }
+    }
+
+    public boolean status(int response){
+        if(response == 200){
+            return true;
+        }else{
+            return false;
+        }
+
     }
 
 }

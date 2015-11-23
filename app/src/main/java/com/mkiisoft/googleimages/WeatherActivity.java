@@ -18,7 +18,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
@@ -28,7 +27,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -183,56 +181,23 @@ public class WeatherActivity extends AppCompatActivity {
     private SimpleAdapter   mAdapterHistory;
     private SwingLeftInAnimationAdapter swingLeftInAnimationAdapter;
 
+    // Access to Utils
+    Utils.ApiCall mApiCall;
+
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         setContentView(R.layout.activity_weather);
         setStatusBarTranslucent(true);
 
+        mApiCall = new Utils.ApiCall();
+
         mAction = getSupportActionBar();
         mAction.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         mAction.setTitle("");
 
-        sunView       = new SunView(WeatherActivity.this);
-        windView      = new WindView(WeatherActivity.this);
-        moonView      = new MoonView(WeatherActivity.this);
-        cloudView     = new CloudView(WeatherActivity.this);
-        thunderView   = new CloudThunderView(WeatherActivity.this);
-        rainView      = new CloudRainView(WeatherActivity.this);
-        fogView       = new CloudFogView(WeatherActivity.this);
-        cloudSunView  = new CloudSunView(WeatherActivity.this);
-        cloudMoonView = new CloudMoonView(WeatherActivity.this);
-        cloudSnowView = new CloudSnowView(WeatherActivity.this);
-
-        cloudView.setBgColor(Color.parseColor("#00FFFFFF"));
-        cloudView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
-
-        sunView.setBgColor(Color.parseColor("#00FFFFFF"));
-        sunView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
-
-        windView.setBgColor(Color.parseColor("#00FFFFFF"));
-        windView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
-
-        moonView.setBgColor(Color.parseColor("#00FFFFFF"));
-        moonView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
-
-        fogView.setBgColor(Color.parseColor("#00FFFFFF"));
-        fogView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
-
-        rainView.setBgColor(Color.parseColor("#00FFFFFF"));
-        rainView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
-
-        thunderView.setBgColor(Color.parseColor("#00FFFFFF"));
-        thunderView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
-
-        cloudSunView.setBgColor(Color.parseColor("#00FFFFFF"));
-        cloudSunView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
-
-        cloudMoonView.setBgColor(Color.parseColor("#00FFFFFF"));
-        cloudMoonView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
-
-        cloudSnowView.setBgColor(Color.parseColor("#00FFFFFF"));
-        cloudSnowView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
+        initCustomWeatherViews();
+        decorateCustomWeatherViews();
 
         mProgress = (AVLoadingIndicatorView) findViewById(R.id.progress_balls);
 
@@ -455,29 +420,12 @@ public class WeatherActivity extends AppCompatActivity {
 
     }
 
-    private class WeatherApi {
-
-        private AsyncHttpClient client = new AsyncHttpClient();
-
-        public void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-            client.get(getAbsoluteUrl(url), params, responseHandler);
-        }
-
-        public void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-            client.post(getAbsoluteUrl(url), params, responseHandler);
-        }
-
-        private String getAbsoluteUrl(String relativeUrl) {
-            return relativeUrl;
-        }
-    }
-
     public void AsyncConnection(String urlConnection) {
 
-        new WeatherApi().get(urlConnection, null, new AsyncHttpResponseHandler() {
+        mApiCall.get(urlConnection, null, new AsyncHttpResponseHandler() {
 
             @Override
-            public void onStart(){
+            public void onStart() {
                 mChildTemp.setEnabled(true);
                 mProgress.setVisibility(View.VISIBLE);
                 mProgress.animate().alpha(1).setStartDelay(500).setDuration(400).withEndAction(new Runnable() {
@@ -511,7 +459,7 @@ public class WeatherActivity extends AppCompatActivity {
 
                         for (int imgs = 0; imgs < jsonResults.length(); imgs++) {
 
-                            HashMap<String, String> images = new HashMap<String, String>();
+                            HashMap<String, String> images = new HashMap<>();
 
                             JSONObject imagesResult = jsonResults.getJSONObject(imgs);
 
@@ -531,51 +479,51 @@ public class WeatherActivity extends AppCompatActivity {
                                 result = data.get(ran);
                                 String img = result.get("images");
                                 Glide.with(WeatherActivity.this).load(img).asBitmap().override(800, 800).
-                                into(new SimpleTarget() {
-                                    @Override
-                                    public void onResourceReady(Object resource, GlideAnimation glideAnimation) {
-
-                                        mTitleCity.setTranslationY(-50);
-                                        mTitleCity.setText(city);
-                                        CharSequence text = mTitleCity.getText();
-                                        float width = mTitleCity.getPaint().measureText(text, 0, text.length());
-                                        int textWidth = Math.round(width);
-                                        float percent = (float) textWidth / 140 * 100;
-                                        int newWidth = (int) percent;
-                                        final Bitmap finalBitmap = (Bitmap) resource;
-                                        mWeatherImage.animate().alpha(0.2f).setDuration(400).withEndAction(new Runnable() {
+                                        into(new SimpleTarget() {
                                             @Override
-                                            public void run() {
-                                                mWeatherImage.setAlpha(0.2f);
-                                                mWeatherImage.setImageBitmap(finalBitmap);
-                                                mWeatherImage.animate().alpha(1).setDuration(800).withEndAction(new Runnable() {
+                                            public void onResourceReady(Object resource, GlideAnimation glideAnimation) {
+
+                                                mTitleCity.setTranslationY(-50);
+                                                mTitleCity.setText(city);
+                                                CharSequence text = mTitleCity.getText();
+                                                float width = mTitleCity.getPaint().measureText(text, 0, text.length());
+                                                int textWidth = Math.round(width);
+                                                float percent = (float) textWidth / 130 * 100;
+                                                int newWidth = (int) percent;
+                                                final Bitmap finalBitmap = (Bitmap) resource;
+                                                mWeatherImage.animate().alpha(0.2f).setDuration(400).withEndAction(new Runnable() {
                                                     @Override
                                                     public void run() {
-                                                        mTitleCity.animate().alpha(1).translationY(0).setStartDelay(200).setDuration(600).setInterpolator(new DecelerateInterpolator());
-                                                        if (!isFistTime) {
-                                                            city = edit.getText().toString();
-                                                            isFistTime = false;
-                                                        }
-                                                        AsyncWeather(mApiWeather + city + mApiWeatherFull);
+                                                        mWeatherImage.setAlpha(0.2f);
+                                                        mWeatherImage.setImageBitmap(finalBitmap);
+                                                        mWeatherImage.animate().alpha(1).setDuration(800).withEndAction(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                mTitleCity.animate().alpha(1).translationY(0).setStartDelay(200).setDuration(600).setInterpolator(new DecelerateInterpolator());
+                                                                if (!isFistTime) {
+                                                                    city = edit.getText().toString();
+                                                                    isFistTime = false;
+                                                                }
+                                                                AsyncWeather(mApiWeather + city + mApiWeatherFull);
+                                                            }
+                                                        });
                                                     }
                                                 });
+                                                final ResizeAnimation resizeAnimation = new ResizeAnimation(mLineColor, newWidth);
+                                                resizeAnimation.setDuration(600);
+                                                resizeAnimation.setStartOffset(400);
+                                                mLineColor.startAnimation(resizeAnimation);
+
+                                            }
+
+                                            @Override
+                                            public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                                                int randoms = Utils.randInt(0, 7);
+                                                result = data.get(randoms);
+                                                String images = result.get("images");
+                                                Glide.with(WeatherActivity.this).load(images).override(800, 800).into(mWeatherImage);
                                             }
                                         });
-                                        final ResizeAnimation resizeAnimation = new ResizeAnimation(mLineColor, newWidth);
-                                        resizeAnimation.setDuration(600);
-                                        resizeAnimation.setStartOffset(400);
-                                        mLineColor.startAnimation(resizeAnimation);
-
-                                    }
-
-                                    @Override
-                                    public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                                        int randoms = Utils.randInt(0, 7);
-                                        result = data.get(randoms);
-                                        String images = result.get("images");
-                                        Glide.with(WeatherActivity.this).load(images).override(800, 800).into(mWeatherImage);
-                                    }
-                                });
                             }
                         });
                     }
@@ -594,7 +542,7 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     public void AsyncWeather(String urlConnection) {
-        new WeatherApi().get(urlConnection, null, new AsyncHttpResponseHandler() {
+        mApiCall.get(urlConnection, null, new AsyncHttpResponseHandler() {
 
             @Override
             public void onStart() {
@@ -627,7 +575,7 @@ public class WeatherActivity extends AppCompatActivity {
                     JSONArray forecast = itemObject.getJSONArray("forecast");
 
                     for(int f = 0; f < forecast.length(); f++){
-                        HashMap<String, String> forecastHash = new HashMap<String, String>();
+                        HashMap<String, String> forecastHash = new HashMap<>();
                         JSONObject forecastObj = forecast.getJSONObject(f);
 
                         forecastHash.put("code", forecastObj.getString("code"));
@@ -730,6 +678,52 @@ public class WeatherActivity extends AppCompatActivity {
         });
     }
 
+    public void initCustomWeatherViews(){
+        sunView       = new SunView(WeatherActivity.this);
+        windView      = new WindView(WeatherActivity.this);
+        moonView      = new MoonView(WeatherActivity.this);
+        cloudView     = new CloudView(WeatherActivity.this);
+        thunderView   = new CloudThunderView(WeatherActivity.this);
+        rainView      = new CloudRainView(WeatherActivity.this);
+        fogView       = new CloudFogView(WeatherActivity.this);
+        cloudSunView  = new CloudSunView(WeatherActivity.this);
+        cloudMoonView = new CloudMoonView(WeatherActivity.this);
+        cloudSnowView = new CloudSnowView(WeatherActivity.this);
+    }
+
+    public void decorateCustomWeatherViews(){
+
+        cloudView.setBgColor(Color.parseColor("#00FFFFFF"));
+        cloudView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
+
+        sunView.setBgColor(Color.parseColor("#00FFFFFF"));
+        sunView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
+
+        windView.setBgColor(Color.parseColor("#00FFFFFF"));
+        windView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
+
+        moonView.setBgColor(Color.parseColor("#00FFFFFF"));
+        moonView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
+
+        fogView.setBgColor(Color.parseColor("#00FFFFFF"));
+        fogView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
+
+        rainView.setBgColor(Color.parseColor("#00FFFFFF"));
+        rainView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
+
+        thunderView.setBgColor(Color.parseColor("#00FFFFFF"));
+        thunderView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
+
+        cloudSunView.setBgColor(Color.parseColor("#00FFFFFF"));
+        cloudSunView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
+
+        cloudMoonView.setBgColor(Color.parseColor("#00FFFFFF"));
+        cloudMoonView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
+
+        cloudSnowView.setBgColor(Color.parseColor("#00FFFFFF"));
+        cloudSnowView.setLayoutParams(new ViewGroup.LayoutParams(400, 400));
+    }
+
     @TargetApi(Build.VERSION_CODES.KITKAT)
     protected void setStatusBarTranslucent(boolean makeTranslucent) {
         if (makeTranslucent) {
@@ -741,7 +735,6 @@ public class WeatherActivity extends AppCompatActivity {
 
 
     public void revealView(View myView) {
-
 
         int cx = (mFab.getLeft() + mFab.getRight()) / 2;
         int cy = (mFab.getTop() + mFab.getBottom()) / 2;
