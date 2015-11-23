@@ -9,8 +9,8 @@
     <string name="searchbox">The search field can\'t be empty</string>
     <string name="emptystring"></string>
 
-    <!-- api URLs -->
     <string name="apiurl">https://ajax.googleapis.com/ajax/services/search/images?v=1.0&amp;rsz=8&amp;safe=active&amp;as_filetype=jpg&amp;q=</string>
+    <!-- api URLs -->
 
     <!-- image full -->
     <string name="copyright">Copyright protected image. Can\'t be modify.</string>

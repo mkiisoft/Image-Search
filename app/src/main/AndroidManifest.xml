@@ -22,6 +22,7 @@
         <activity android:name=".SelectActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".WeatherActivity"
+            android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait"/>
         <activity android:name=".SearchActivity"
             android:screenOrientation="portrait"/>
