@@ -29,6 +29,9 @@ import android.widget.TextView;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.ResponseHandlerInterface;
+import com.loopj.android.http.SyncHttpClient;
+import com.mkiisoft.googleimages.WeatherActivity;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -120,13 +123,13 @@ public class Utils {
     }
 
     public static void animateTextView(int initialValue, int finalValue, final TextView textview) {
-        DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator(0.2f);
+        DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator(0.4f);
         int start = Math.min(initialValue, finalValue);
         int end = Math.max(initialValue, finalValue);
         int difference = Math.abs(finalValue - initialValue);
         Handler handler = new Handler();
         for (int count = start; count <= end; count++) {
-            int time = Math.round(decelerateInterpolator.getInterpolation((((float) count) / difference)) * 60) * count;
+            int time = Math.round(decelerateInterpolator.getInterpolation((((float) count) / difference)) * 100) * count;
             final int finalCount = ((initialValue > finalValue) ? initialValue - count : count);
             handler.postDelayed(new Runnable() {
                 @Override
@@ -168,6 +171,28 @@ public class Utils {
     }
 
     /**
+     * Static Class to generate "ellipse" string from API > 1 for TextViews.
+     *
+     * You must setText at first to know the final line count and the setText
+     * again to generate the final effect.
+     *
+     * @param textView the TextView you want to apply the ellipse style.
+     * @param maxLines the max number of lines you need to show and ellipse. If 0, will return full text.
+     * @return will return full text if 0 or max lines with ellipse if set > 1.
+     */
+    public static String maxLines(TextView textView, int maxLines) {
+        if (textView.getLineCount() > maxLines && textView.getLineCount() > 0 && maxLines > 0) {
+            int lineEndIndex = textView.getLayout().getLineEnd(maxLines - 1);
+            String line = textView.getText().subSequence(0, lineEndIndex - 3) + "...";
+
+            return line;
+        }else{
+            String normal = textView.getText().toString();
+            return normal;
+        }
+    }
+
+    /**
      *
      * API Call for GET, PUT, POST, DELETE Http responses
      *
@@ -179,6 +204,10 @@ public class Utils {
 
         public void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
             client.get(getAbsoluteUrl(url), params, responseHandler);
+        }
+
+        public void get(Context context, String url, RequestParams params, ResponseHandlerInterface responseHandlerInterface) {
+            client.get(context, getAbsoluteUrl(url), params, responseHandlerInterface);
         }
 
         public void put(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
@@ -196,15 +225,43 @@ public class Utils {
         private String getAbsoluteUrl(String relativeUrl) {
             return relativeUrl;
         }
+
+        public void cancelRequest(boolean cancel){
+            client.cancelAllRequests(cancel);
+        }
     }
 
-    public boolean status(int response){
-        if(response == 200){
-            return true;
-        }else{
-            return false;
+    public static class ApiCallSync {
+
+        private SyncHttpClient client = new SyncHttpClient();
+
+        public void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+            client.get(getAbsoluteUrl(url), params, responseHandler);
         }
 
+        public void get(Context context, String url, RequestParams params, ResponseHandlerInterface responseHandlerInterface) {
+            client.get(context, getAbsoluteUrl(url), params, responseHandlerInterface);
+        }
+
+        public void put(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+            client.put(getAbsoluteUrl(url), params, responseHandler);
+        }
+
+        public void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+            client.post(getAbsoluteUrl(url), params, responseHandler);
+        }
+
+        public void delete(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+            client.delete(getAbsoluteUrl(url), params, responseHandler);
+        }
+
+        private String getAbsoluteUrl(String relativeUrl) {
+            return relativeUrl;
+        }
+
+        public void cancelRequest(boolean cancel){
+            client.cancelAllRequests(cancel);
+        }
     }
 
 }

@@ -102,7 +102,7 @@
                     android:layout_marginLeft="10dp"
                     android:alpha="0"
                     android:gravity="center_vertical|left"
-                    android:text="\u00b0F"
+                    android:text="\u00b0C"
                     android:textColor="#FFF"
                     android:textSize="60dp" />
             </LinearLayout>
@@ -143,8 +143,8 @@
             android:layout_marginRight="16dp"
             android:background="@drawable/ripple"
             android:elevation="8dp"
-            android:src="@drawable/ic_map_marker_white_24dp"
-            android:stateListAnimator="@anim/fab_raise" />
+            android:stateListAnimator="@anim/fab_raise"
+            android:src="@drawable/ic_map_marker_white_24dp" />
 
         <RelativeLayout
             android:id="@+id/expanded_view"
